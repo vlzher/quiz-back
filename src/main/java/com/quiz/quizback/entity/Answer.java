@@ -11,7 +11,7 @@ public class Answer {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "username", referencedColumnName = "username")
+    @JoinColumn(name = "email", referencedColumnName = "email")
     private User user;
 
     @ManyToOne

@@ -14,7 +14,7 @@ public class Quiz {
     private String title;
 
     @ManyToOne
-    @JoinColumn(name = "username", referencedColumnName = "username")
+    @JoinColumn(name = "email", referencedColumnName = "email")
     private User user;
 
     @OneToMany(mappedBy = "quiz")

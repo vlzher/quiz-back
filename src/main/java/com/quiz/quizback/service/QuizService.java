@@ -129,7 +129,7 @@ public class QuizService {
                 chooseOption.setText(chooseOptionDTO.getText());
                 chooseOption.setCorrect(chooseOptionDTO.isCorrect());
                 chooseOption.setQuestion(question);
-                ChooseOption option  = chooseOptionRepository.save(chooseOption);
+                chooseOptionRepository.save(chooseOption);
             }
         }
         List<OrderOptionDTO> orderOptions = request.getOrderOptions();
