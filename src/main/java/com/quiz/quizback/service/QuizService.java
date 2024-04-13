@@ -120,6 +120,8 @@ public class QuizService {
         question.setQuiz(quiz);
         question = questionRepository.save(question);
 
+
+
         List<ChooseOptionDTO> chooseOptions = request.getChooseOptions();
         if (chooseOptions != null && !chooseOptions.isEmpty()) {
             for (ChooseOptionDTO chooseOptionDTO : chooseOptions) {
@@ -127,7 +129,7 @@ public class QuizService {
                 chooseOption.setText(chooseOptionDTO.getText());
                 chooseOption.setCorrect(chooseOptionDTO.isCorrect());
                 chooseOption.setQuestion(question);
-                chooseOptionRepository.save(chooseOption);
+                ChooseOption option  = chooseOptionRepository.save(chooseOption);
             }
         }
         List<OrderOptionDTO> orderOptions = request.getOrderOptions();
@@ -162,7 +164,6 @@ public class QuizService {
                 fileOptionRepository.save(fileOption);
             }
         }
-
 
         return ResponseEntity.status(HttpStatus.CREATED).body(mapQuestionToDTO(question));
     }

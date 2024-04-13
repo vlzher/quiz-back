@@ -1,7 +1,6 @@
 package com.quiz.quizback.controller;
 
 import com.quiz.quizback.dto.*;
-import com.quiz.quizback.entity.Quiz;
 import com.quiz.quizback.service.QuizService;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
