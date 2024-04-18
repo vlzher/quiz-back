@@ -4,6 +4,6 @@ import lombok.Data;
 
 @Data
 public class CreateQuizDTO {
-    private Long id;
+    private String id;
     private String quizTitle;
 }

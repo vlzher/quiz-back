@@ -8,9 +8,5 @@ import java.util.List;
 public class AddQuestionRequest {
     private String text;
     private QuestionType type;
-    private List<ChooseOptionDTO> chooseOptions;
-    private List<OrderOptionDTO> orderOptions;
-    private List<MatchOptionDTO> matchOptions;
-    private List<FileOptionDTO> fileOptions;
-
+    private List<OptionDTO> options;
 }

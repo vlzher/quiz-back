@@ -31,22 +31,22 @@ public class QuizController {
     }
 
     @GetMapping("/{quizID}")
-    public ResponseEntity<QuizDTO> getQuizByID(@PathVariable Long quizID) {
+    public ResponseEntity<QuizDTO> getQuizByID(@PathVariable String quizID) {
         return quizService.getQuizWithQuestions(quizID);
     }
 
     @DeleteMapping("/{quizID}")
-    public void removeQuiz(@PathVariable Long quizID) {
+    public void removeQuiz(@PathVariable String quizID) {
         quizService.removeQuiz(quizID);
     }
 
     @PostMapping("/{quizID}/addQuestion")
-    public ResponseEntity<QuestionDTO> addQuestion(@PathVariable Long quizID, @RequestBody AddQuestionRequest request) {
+    public ResponseEntity<QuestionDTO> addQuestion(@PathVariable String quizID, @RequestBody AddQuestionRequest request) {
         return quizService.addQuestion(quizID, request);
     }
 
     @DeleteMapping("/{quizID}/{questionID}")
-    public void deleteQuestion(@PathVariable Long quizID, @PathVariable Long questionID) {
+    public void deleteQuestion(@PathVariable String quizID, @PathVariable String questionID) {
         quizService.deleteQuestion(quizID, questionID);
     }
 
