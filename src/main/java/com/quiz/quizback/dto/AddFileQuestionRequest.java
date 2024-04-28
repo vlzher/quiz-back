@@ -5,8 +5,6 @@ import lombok.Data;
 
 import java.util.List;
 @Data
-public class AddQuestionRequest {
+public class AddFileQuestionRequest {
     private String text;
-    private QuestionType type;
-    private List<OptionDTO> options;
 }

@@ -8,6 +8,4 @@ public class OptionDTO {
     private String text;
     private Boolean isLeft;
     private String questionID;
-
-
 }

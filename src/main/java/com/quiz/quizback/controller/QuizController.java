@@ -6,6 +6,10 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -25,8 +29,10 @@ public class QuizController {
 
     @PostMapping
     public ResponseEntity<CreateQuizDTO> createQuiz(@RequestBody CreateQuizRequest request) {
+        JwtAuthenticationToken jwt = (JwtAuthenticationToken)SecurityContextHolder.getContext().getAuthentication();
+        String username = (String) jwt.getTokenAttributes().get("sub");
         String quizTitle = request.getQuizTitle();
-        CreateQuizDTO createdQuiz = quizService.createQuiz(quizTitle);
+        CreateQuizDTO createdQuiz = quizService.createQuiz(quizTitle,username);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdQuiz);
     }
 
@@ -35,20 +41,54 @@ public class QuizController {
         return quizService.getQuizWithQuestions(quizID);
     }
 
-    @DeleteMapping("/{quizID}")
-    public void removeQuiz(@PathVariable String quizID) {
-        quizService.removeQuiz(quizID);
+    @PostMapping("/{quizID}/addOneChooseQuestion")
+    public ResponseEntity<QuestionDTO> addOneChooseQuestion(@PathVariable String quizID, @RequestBody AddChooseQuestionRequest request) {
+        JwtAuthenticationToken jwt = (JwtAuthenticationToken)SecurityContextHolder.getContext().getAuthentication();
+        String username = (String) jwt.getTokenAttributes().get("sub");
+        return quizService.addChooseQuestion(quizID, request,username);
     }
 
-    @PostMapping("/{quizID}/addQuestion")
-    public ResponseEntity<QuestionDTO> addQuestion(@PathVariable String quizID, @RequestBody AddQuestionRequest request) {
-        return quizService.addQuestion(quizID, request);
+    @PostMapping("/{quizID}/addMultipleChooseQuestion")
+    public ResponseEntity<QuestionDTO> addMultipleChooseQuestion(@PathVariable String quizID, @RequestBody AddMultipleQuestionRequest request) {
+        JwtAuthenticationToken jwt = (JwtAuthenticationToken)SecurityContextHolder.getContext().getAuthentication();
+        String username = (String) jwt.getTokenAttributes().get("sub");
+        return quizService.addMultipleChooseQuestion(quizID, request,username);
+    }
+
+    @PostMapping("/{quizID}/addFileQuestion")
+    public ResponseEntity<QuestionDTO> addFileQuestion(@PathVariable String quizID, @RequestBody AddFileQuestionRequest request) {
+        JwtAuthenticationToken jwt = (JwtAuthenticationToken)SecurityContextHolder.getContext().getAuthentication();
+        String username = (String) jwt.getTokenAttributes().get("sub");
+        return quizService.addFileQuestion(quizID, request,username);
+    }
+    @PostMapping("/{quizID}/addOrderQuestion")
+    public ResponseEntity<QuestionDTO> addOrderQuestion(@PathVariable String quizID, @RequestBody AddOrderQuestionRequest request) {
+        JwtAuthenticationToken jwt = (JwtAuthenticationToken)SecurityContextHolder.getContext().getAuthentication();
+        String username = (String) jwt.getTokenAttributes().get("sub");
+        return quizService.addOrderQuestion(quizID, request,username);
+    }
+    @PostMapping("/{quizID}/addMatchQuestion")
+    public ResponseEntity<QuestionDTO> addMatchQuestion(@PathVariable String quizID, @RequestBody AddMatchQuestionRequest request) {
+        JwtAuthenticationToken jwt = (JwtAuthenticationToken)SecurityContextHolder.getContext().getAuthentication();
+        String username = (String) jwt.getTokenAttributes().get("sub");
+        return quizService.addMatchQuestion(quizID, request,username);
+    }
+
+    @DeleteMapping("/{quizID}")
+    public ResponseEntity<QuizDTO> deleteQuiz(@PathVariable String quizID) {
+        JwtAuthenticationToken jwt = (JwtAuthenticationToken)SecurityContextHolder.getContext().getAuthentication();
+        String username = (String) jwt.getTokenAttributes().get("sub");
+        return quizService.deleteQuiz(quizID,username);
     }
 
     @DeleteMapping("/{quizID}/{questionID}")
-    public void deleteQuestion(@PathVariable String quizID, @PathVariable String questionID) {
-        quizService.deleteQuestion(quizID, questionID);
+    public ResponseEntity<QuestionDTO> deleteQuestion(@PathVariable String quizID, @PathVariable String questionID) {
+        JwtAuthenticationToken jwt = (JwtAuthenticationToken)SecurityContextHolder.getContext().getAuthentication();
+        String username = (String) jwt.getTokenAttributes().get("sub");
+        return quizService.deleteQuestion(quizID, questionID,username);
     }
+
+
 
 //    @PostMapping("/{quizID}/answers")
 //    public void addAnswers(@PathVariable Long quizID) {

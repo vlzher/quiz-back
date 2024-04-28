@@ -19,6 +19,7 @@ public class Answer {
     private List<List<String>> matchAnswers;
     private String chooseAnswer;
     private Byte[] file;
+    private Boolean isCorrect;
 
 }
 

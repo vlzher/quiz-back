@@ -14,7 +14,7 @@ public class Question {
     private String text;
     private QuestionType type;
     private String quizID;
-    private List<String> correctOptions;
+    private List<String> correctChooseOptions;
     private List<String> correctOrder;
     private List<List<String>> correctMatch;
     private String correctChooseOption;
