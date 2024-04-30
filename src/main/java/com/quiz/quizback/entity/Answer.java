@@ -5,7 +5,6 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.List;
-import java.util.Optional;
 
 @Document
 @Data
@@ -18,7 +17,8 @@ public class Answer {
     private List<String> orderAnswers;
     private List<List<String>> matchAnswers;
     private String chooseAnswer;
-    private Byte[] file;
+    private String fileName;
+    private byte[] file;
     private Boolean isCorrect;
 
 }

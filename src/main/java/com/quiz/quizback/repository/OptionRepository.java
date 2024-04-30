@@ -9,4 +9,5 @@ public interface OptionRepository extends MongoRepository<Option, String> {
     List<Option> findByQuestionID(String questionID);
 
     void deleteByQuestionID(String questionID);
+    void deleteAllByQuestionID(String questionID);
 }

@@ -9,10 +9,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.io.IOException;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -27,6 +25,9 @@ public class QuizService {
 
     @Autowired
     private OptionRepository optionRepository;
+
+    @Autowired
+    private AnswerRepository answerRepository;
 
 
     @Autowired
@@ -271,6 +272,129 @@ public class QuizService {
         return ResponseEntity.status(HttpStatus.CREATED).body(mapQuestionToDTO(question));
     }
 
+    public ResponseEntity<Boolean> answerMatchQuestion(String questionID, AnswerMatchQuestionRequest request, String username){
+        Optional<Question> questionOptional = questionRepository.findById(questionID);
+        if (questionOptional.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        Optional<Answer> answerOptional = Optional.ofNullable(answerRepository.findByQuestionIDAndUserID(questionID, username));
+        if (answerOptional.isPresent()) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        }
+        Question question = questionOptional.get();
+        Boolean isCorrect = Objects.equals(request.getAnswer(), question.getCorrectMatch());
+        Answer answer = new Answer();
+        answer.setQuestionID(questionID);
+        answer.setIsCorrect(isCorrect);
+        answer.setUserID(username);
+        answer.setMatchAnswers(request.getAnswer());
+        answerRepository.save(answer);
+        return ResponseEntity.ok(isCorrect);
+    }
+
+    public ResponseEntity<Boolean> answerOrderQuestion(String questionID, AnswerOrderQuestionRequest request, String username){
+        Optional<Question> questionOptional = questionRepository.findById(questionID);
+        if (questionOptional.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        Optional<Answer> answerOptional = Optional.ofNullable(answerRepository.findByQuestionIDAndUserID(questionID, username));
+        if (answerOptional.isPresent()) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        }
+        Question question = questionOptional.get();
+        Boolean isCorrect = Objects.equals(request.getAnswer(), question.getCorrectOrder());
+        Answer answer = new Answer();
+        answer.setQuestionID(questionID);
+        answer.setIsCorrect(isCorrect);
+        answer.setUserID(username);
+        answer.setOrderAnswers(request.getAnswer());
+        answerRepository.save(answer);
+
+        return ResponseEntity.ok(isCorrect);
+
+    }
+
+    public ResponseEntity<Boolean> answerFileQuestion(String questionID, AnswerFileQuestionRequest request, String username){
+        Optional<Question> questionOptional = questionRepository.findById(questionID);
+        if (questionOptional.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        Optional<Answer> answerOptional = Optional.ofNullable(answerRepository.findByQuestionIDAndUserID(questionID, username));
+        if (answerOptional.isPresent()) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        }
+        try {
+            byte[] fileBytes = request.getFile().getBytes();
+            Answer answer = new Answer();
+            answer.setQuestionID(questionID);
+            answer.setIsCorrect(true);
+            answer.setUserID(username);
+            answer.setFileName(request.getFile().getOriginalFilename());
+            answer.setFile(fileBytes);
+            answerRepository.save(answer);
+            return ResponseEntity.ok(true);
+        }
+        catch (IOException ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(false);
+        }
+    }
+
+    public ResponseEntity<Boolean> answerChooseQuestion(String questionID, AnswerChooseQuestionRequest request, String username){
+        Optional<Question> questionOptional = questionRepository.findById(questionID);
+        if (questionOptional.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        Optional<Answer> answerOptional = Optional.ofNullable(answerRepository.findByQuestionIDAndUserID(questionID, username));
+        if (answerOptional.isPresent()) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        }
+        Question question = questionOptional.get();
+        Boolean isCorrect = Objects.equals(request.getAnswer(), question.getCorrectChooseOption());
+        Answer answer = new Answer();
+        answer.setQuestionID(questionID);
+        answer.setIsCorrect(isCorrect);
+        answer.setUserID(username);
+        answer.setChooseAnswer(request.getAnswer());
+        answerRepository.save(answer);
+
+        return ResponseEntity.ok(isCorrect);
+
+    }
+
+    public ResponseEntity<Boolean> answerMultipleChooseQuestion(String questionID, AnswerMultipleQuestionRequest request, String username){
+        Optional<Question> questionOptional = questionRepository.findById(questionID);
+        if (questionOptional.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        Optional<Answer> answerOptional = Optional.ofNullable(answerRepository.findByQuestionIDAndUserID(questionID, username));
+        if (answerOptional.isPresent()) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        }
+        Question question = questionOptional.get();
+        Boolean isCorrect = Objects.equals(request.getAnswer(), question.getCorrectChooseOptions());
+        Answer answer = new Answer();
+        answer.setQuestionID(questionID);
+        answer.setIsCorrect(isCorrect);
+        answer.setUserID(username);
+        answer.setChooseAnswers(request.getAnswer());
+        answerRepository.save(answer);
+        return ResponseEntity.ok(isCorrect);
+    }
+
+
+    public ResponseEntity<AnswerDTO> getAnswers(String quizID, String username){
+
+        Optional<Quiz> quizOptional = quizRepository.findById(quizID);
+        if (quizOptional.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        List<Question> questions = questionRepository.findByQuizID(quizID);
+        List <Answer> answers = new ArrayList<>();
+        questions.forEach(question -> {
+            answers.add(answerRepository.findByQuestionIDAndUserID(question.getId(),username));
+        });
+        return ResponseEntity.ok(modelMapper.map(answers, AnswerDTO.class));
+    }
 
     public ResponseEntity<QuestionDTO> deleteQuestion(String quizID, String questionID,String username) {
         if(!checkQuizOwner(quizID,username)) {
@@ -286,6 +410,7 @@ public class QuizService {
         }
         optionRepository.deleteByQuestionID(questionID);
         questionRepository.deleteById(questionID);
+        answerRepository.deleteAllByQuestionID(questionID);
         return ResponseEntity.noContent().build();
     }
 
@@ -295,13 +420,27 @@ public class QuizService {
         }
         List<Question> questions = questionRepository.findByQuizID(quizID);
         questions.forEach(question -> {
-            optionRepository.deleteByQuestionID(question.getId());
+            optionRepository.deleteAllByQuestionID(question.getId());
+            answerRepository.deleteAllByQuestionID(question.getId());
         });
-        questionRepository.deleteByQuizID(quizID);
+        questionRepository.deleteAllByQuizID(quizID);
         quizRepository.deleteById(quizID);
-
         return ResponseEntity.noContent().build();
     }
+
+    public ResponseEntity<List<Double>> getStats(String quizID) {
+        List<Question> questions = questionRepository.findByQuizID(quizID);
+        List<Double> stats = new ArrayList<>();
+        questions.forEach(question -> {
+            List<Answer> answers = answerRepository.findAllByQuestionID(question.getId());
+            long count = answers.stream().filter(Answer::getIsCorrect).count();
+            stats.add((double) count / answers.size());
+        });
+        return ResponseEntity.ok(stats);
+
+    }
+
+
 }
 
 
