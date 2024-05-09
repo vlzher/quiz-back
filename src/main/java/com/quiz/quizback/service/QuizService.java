@@ -3,6 +3,7 @@ package com.quiz.quizback.service;
 import com.quiz.quizback.dto.*;
 import com.quiz.quizback.entity.*;
 import com.quiz.quizback.repository.*;
+import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -15,6 +16,7 @@ import java.util.stream.Collectors;
 
 
 @Service
+@Log4j2
 public class QuizService {
 
     @Autowired
@@ -269,6 +271,7 @@ public class QuizService {
             correctAnswerIds.add(correctOptionId);
         });
         question.setCorrectMatch(correctAnswerIds);;
+        questionRepository.save(question);
         return ResponseEntity.status(HttpStatus.CREATED).body(mapQuestionToDTO(question));
     }
 
