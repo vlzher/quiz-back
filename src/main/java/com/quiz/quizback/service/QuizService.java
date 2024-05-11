@@ -172,6 +172,9 @@ public class QuizService {
         if(!checkQuizOwner(quizID,username)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
+        if(request.getText() == null || request.getText().isEmpty()){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
         Optional<Quiz> quizOptional = quizRepository.findById(quizID);
         if (quizOptional.isEmpty()) {
             return ResponseEntity.notFound().build();
@@ -239,12 +242,14 @@ public class QuizService {
         leftOptions.forEach(optionDTO -> {
             Option option = modelMapper.map(optionDTO, Option.class);
             option.setQuestionID(questionID);
+            option.setIsLeft(true);
             optionRepository.save(option);
         });
         List<OptionDTO> rightOptions = request.getRightOptions();
         rightOptions.forEach(optionDTO -> {
             Option option = modelMapper.map(optionDTO, Option.class);
             option.setQuestionID(questionID);
+            option.setIsLeft(false);
             optionRepository.save(option);
         });
         List<List<Integer>> correctAnswer  = request.getCorrectAnswer();
@@ -385,7 +390,7 @@ public class QuizService {
     }
 
 
-    public ResponseEntity<AnswerDTO> getAnswers(String quizID, String username){
+    public ResponseEntity<List<AnswerDTO>> getAnswers(String quizID, String username){
 
         Optional<Quiz> quizOptional = quizRepository.findById(quizID);
         if (quizOptional.isEmpty()) {
@@ -394,9 +399,15 @@ public class QuizService {
         List<Question> questions = questionRepository.findByQuizID(quizID);
         List <Answer> answers = new ArrayList<>();
         questions.forEach(question -> {
-            answers.add(answerRepository.findByQuestionIDAndUserID(question.getId(),username));
+            Answer answer = answerRepository.findByQuestionIDAndUserID(question.getId(), username);
+            if (answer != null) {
+                answers.add(answer);
+            }
         });
-        return ResponseEntity.ok(modelMapper.map(answers, AnswerDTO.class));
+        List<AnswerDTO> answerDTOS = answers.stream()
+                .map(answer -> modelMapper.map(answer, AnswerDTO.class))
+                .toList();
+        return ResponseEntity.ok(answerDTOS);
     }
 
     public ResponseEntity<QuestionDTO> deleteQuestion(String quizID, String questionID,String username) {

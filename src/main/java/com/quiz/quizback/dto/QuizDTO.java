@@ -9,4 +9,5 @@ public class QuizDTO {
     private String id;
     private String title;
     private List<QuestionDTO> questions;
+    private String userID;
 }

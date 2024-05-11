@@ -90,9 +90,10 @@ public class QuizController {
     }
 
     @PostMapping("/answerFileQuestion/{questionID}")
-    public ResponseEntity<Boolean> answerFileQuestion(@PathVariable String questionID, @RequestParam("file") MultipartFile file, @RequestBody AnswerFileQuestionRequest request) {
+    public ResponseEntity<Boolean> answerFileQuestion(@PathVariable String questionID, @RequestParam("file") MultipartFile file) {
         JwtAuthenticationToken jwt = (JwtAuthenticationToken)SecurityContextHolder.getContext().getAuthentication();
         String username = (String) jwt.getTokenAttributes().get("sub");
+        AnswerFileQuestionRequest request = new AnswerFileQuestionRequest();
         request.setFile(file);
         return quizService.answerFileQuestion(questionID, request, username);
     }
@@ -112,7 +113,7 @@ public class QuizController {
     }
 
     @GetMapping("/{quizID}/getAnswers")
-    public ResponseEntity<AnswerDTO> getAnswers(@PathVariable String quizID) {
+    public ResponseEntity<List<AnswerDTO>> getAnswers(@PathVariable String quizID) {
         JwtAuthenticationToken jwt = (JwtAuthenticationToken)SecurityContextHolder.getContext().getAuthentication();
         String username = (String) jwt.getTokenAttributes().get("sub");
         return quizService.getAnswers(quizID, username);
@@ -140,21 +141,4 @@ public class QuizController {
         return quizService.deleteQuestion(quizID, questionID,username);
     }
 
-
-
-
-
-//    @PostMapping("/{quizID}/answers")
-//    public void addAnswers(@PathVariable Long quizID) {
-//        quizService.addAnswers(quizID);
-//    }
-
-//    @GetMapping("/{quizID}/answers")
-//    public void getAnswers(@PathVariable Long quizID) {
-//        quizService.addAnswers(quizID);
-//    }
-//    @GetMapping("/{quizID}/stats")
-//    public QuizStats getStats(@PathVariable Long quizID) {
-//        return quizService.getStats(quizID);
-//    }
 }
